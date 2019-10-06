@@ -13,8 +13,7 @@ function process(editor, link) {
     const withoutComments = stripComments(lines);
     const singleLine = withoutComments.join(';');
     const url = window.location.href;
-    const consoleLog = `console.log("Edit this code at ${JSON.stringify(url)}");`;
-    console.log('url is', url);
+    const consoleLog = `console.log("Edit this code at", ${JSON.stringify(url)});`;
     const iife = `(function() { ${singleLine}; ${consoleLog} })()`;
     const href = `javascript:${iife}`;
     link.setAttribute('href', href);
