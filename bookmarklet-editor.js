@@ -1,17 +1,25 @@
 const editor = document.getElementById('editor');
 const link = document.getElementById('link');
 
+function persist(value) {
+    window.localStorage.setItem('lastCode', value);
+    window.location.hash = encodeURIComponent(value);
+}
+
 function process(editor, link) {
     const { value } = editor;
     const lines = value.split('\n');
     const name = lines[1].match(/\s+\*\s+(\w.*)/)[1];
     const withoutComments = stripComments(lines);
     const singleLine = withoutComments.join(';');
-    const iife = `(function() { ${singleLine} })()`;
+    const url = window.location.href;
+    const consoleLog = `console.log("Edit this code at ${JSON.stringify(url)}");`;
+    console.log('url is', url);
+    const iife = `(function() { ${singleLine}; ${consoleLog} })()`;
     const href = `javascript:${iife}`;
     link.setAttribute('href', href);
     link.innerHTML = name;
-    window.localStorage.setItem('lastCode', value);
+    persist(value);
 }
 
 function stripComments(lines) {
@@ -51,9 +59,12 @@ function stripComments(lines) {
 }
 
 function initialize(editor, link) {
-    const lastCode = window.localStorage.getItem('lastCode');
-    if (lastCode !== null) {
-        editor.value = lastCode;
+    const hashCode = decodeURIComponent(window.location.hash).replace(/^#/, '');;
+    const localStorageCode = window.localStorage.getItem('lastCode');
+    if (hashCode !== '') {
+        editor.value = hashCode;
+    } else if (localStorageCode !== null) {
+        editor.value = localStorageCode;
     }
 
     process(editor, link);
@@ -73,8 +84,8 @@ editor.addEventListener('keydown', (e) => {
 
         // Set textarea value to: text before caret + tab + text after caret
         editor.value = currentValue.substring(0, start)
-                    + '    '
-                    + currentValue.substring(end);
+            + '    '
+            + currentValue.substring(end);
 
         // Put caret at right position again
         editor.selectionStart = start + 1;
