@@ -12,8 +12,8 @@ function process(editor, link) {
     const name = lines[1].match(/\s+\*\s+(\w.*)/)[1];
     const withoutComments = stripComments(lines);
     const singleLine = withoutComments.join(';');
-    const url = window.location.href;
-    const consoleLog = `console.log("Edit this code at", ${JSON.stringify(url)});`;
+    const url = window.location.toString();
+    const consoleLog = `console.log("Edit this code at", ${JSON.stringify(encodeURIComponent(url))});`;
     const iife = `(function() { ${singleLine}; ${consoleLog} })()`;
     const href = `javascript:${iife}`;
     link.setAttribute('href', href);
